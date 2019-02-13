@@ -7,6 +7,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import com.learn.customannotation.Emp;
 import com.learn.customannotation.TempEmp;
 import com.learn.service.EmpRegisterService;
 
@@ -14,22 +15,32 @@ import com.learn.service.EmpRegisterService;
 public class HelloRest {
 	
 	@Inject @TempEmp
-	EmpRegisterService empRegisterService;
+	EmpRegisterService tempEmpRegisterServiceImp;
+	
+	@Inject @Emp
+	EmpRegisterService empRegisterServiceImp;
 
 	 @GET                        // http://localhost:8080/cdiInjectionWebProj/rest/hello
 	 public String hello() {
-		 System.out.println("hiiiii rest resource method hello rest get called:"+empRegisterService);
+		 System.out.println("hiiiii rest resource method hello rest get called:"+tempEmpRegisterServiceImp);
          
-		 Optional<EmpRegisterService> opt = Optional.ofNullable(empRegisterService);
-		 if(opt.isPresent()){
-			 System.out.println("employee service is not null");
+		 Optional<EmpRegisterService> tempOpt = Optional.ofNullable(tempEmpRegisterServiceImp);
+		 Optional<EmpRegisterService> opt = Optional.ofNullable(empRegisterServiceImp);
+		 if((tempOpt.isPresent()) && (opt.isPresent())){
+			 System.out.println("empl and temp emp service object is not null");
 		 }
-		 opt.ifPresent( emp -> { System.out.println("if object is not null");
 		 
-		              });
-		 opt.ifPresent( emp -> { System.out.println("if object is not null:");
-		                         emp.display();
-                       });
+		 tempOpt.ifPresent(tempEmp -> {
+			 System.out.println("calling temp emp display method:");
+			 tempEmp.display();
+		 });
+		 
+		 opt.ifPresent(emp -> {
+			 System.out.println("calling emp display method:");
+			 emp.display();
+		 });
+		
+		 
 		 
 		 
 	     return "Hello method get called!";
