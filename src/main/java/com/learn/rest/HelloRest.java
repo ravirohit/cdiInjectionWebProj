@@ -3,16 +3,22 @@ package com.learn.rest;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 
 import com.learn.customannotation.Emp;
 import com.learn.customannotation.TempEmp;
 import com.learn.pojoentity.ApplicationScope;
+import com.learn.pojoentity.ConversationScope;
 import com.learn.pojoentity.RequestScope;
 import com.learn.pojoentity.ScopeEntityWithoutAnnotatation;
+import com.learn.pojoentity.SessionStore;
 import com.learn.pojoentity.ShortTimeScopeInsideLongScope;
 import com.learn.pojoentity.SingletonScope;
 import com.learn.service.EmpRegisterService;
@@ -37,17 +43,25 @@ public class HelloRest {
 	@Inject
 	ApplicationScope applicationScope1;
 	
-	@Inject
-	SingletonScope singletonScope;
+	@Inject                      // It is early initialize. beans whenever this class object(rest class) is reference that time is created, it is
+	SingletonScope singletonScope;      //being used or not no matter it will be injected.
 	
 	@Inject 
-	ShortTimeScopeInsideLongScope shortTimeScopeInsideLongScope;
+	ShortTimeScopeInsideLongScope shortTimeScopeInsideLongScope;   // it is lazy initialize, when it is used then object created
 	
-	@Inject 
+	@Inject                         // it is early initialization just like Singleton class.
 	ScopeEntityWithoutAnnotatation scopeEntityWithoutAnnotatation;
 	
 	@Inject 
 	ScopeEntityWithoutAnnotatation scopeEntityWithoutAnnotatation1;
+	
+	
+	// session scope
+	@Inject                               // it is lazy initialization. it is created when this variable is referenced.
+	SessionStore session;
+	
+	@Inject
+	ConversationScope conversationScope;
 	
 	 @Path("test")    // http://localhost:8080/cdiInjectionWebProj/rest/hello/test
 	 @GET
@@ -59,10 +73,11 @@ public class HelloRest {
 	     return "Test method get called!";
 	 }
 	
-	 @GET             //  http://localhost:8080/cdiInjectionWebProj/rest/hello
+	 @GET          //  http://localhost:8080/cdiInjectionWebProj/rest/hello
 	 public String hello() {
-		 System.out.println("hiiiii rest resource method hello rest get called:"+tempEmpRegisterServiceImp);
-         
+		 System.out.println("Rest resource method hello rest get called:"+tempEmpRegisterServiceImp);
+
+        
 		 Optional<EmpRegisterService> tempOpt = Optional.ofNullable(tempEmpRegisterServiceImp);
 		 Optional<EmpRegisterService> opt = Optional.ofNullable(empRegisterServiceImp);
 		 if((tempOpt.isPresent()) && (opt.isPresent())){
@@ -123,6 +138,57 @@ public class HelloRest {
 		 //reqopt.ifPresent(req -> req.);
 		 return "interscopetest called:" + name;
 	 }
+	 
+	 @Path("login/{uname}")        // for session object
+	 @GET
+	 public String sessionTest(@PathParam("uname") String uname){
+
+        System.out.println("session established for the user:"+uname);
+		session.setUname(uname);
+		
+		 return "session scope method called";
+	 }
+	 @Path("logout")               // for session object
+	 @GET
+	 public String logout(@Context HttpServletRequest request){
+
+		 System.out.println("invalidated session object for the user:"+session.getUname());
+		 HttpSession httpSession = request.getSession();
+         System.out.println(httpSession.getId());
+         httpSession.invalidate();
+         if(session.getUname() == null){
+             return "user doesn't exist";
+         }
+         
+         return "user logout successfully";
+	 }
+	 @Path("cookieInfo")               // for session object
+	 @GET
+	 public String printCookie(@Context HttpServletRequest request){
+
+         Cookie[] cookies = request.getCookies();
+         System.out.println("creating optional of cookies object");
+         Optional<Cookie[]> cookieOpt = Optional.ofNullable(cookies);
+         System.out.println("created optional of cookies object");
+         cookieOpt.ifPresent(cookies1 -> {
+        	  for(Cookie cookie: cookies1){
+             	 System.out.println(cookie);
+             	 System.out.println(cookie.getValue());
+              }
+        	 
+         });
+		
+         return "cookie info has been has been logged to console";
+	 }
+	 
+	 @Path("conversationscope")
+	 @GET
+	 public String conversationScopeTest(){
+		 
+		 System.out.println("conversation scope object:"+conversationScope+"   id:"+conversationScope.getConversation().getId());
+		 return "conversationscope method invoked";
+	 }
+	 
  
 }
 
