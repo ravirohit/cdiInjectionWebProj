@@ -3,6 +3,7 @@ package com.learn.rest;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -21,6 +22,11 @@ import com.learn.pojoentity.ScopeEntityWithoutAnnotatation;
 import com.learn.pojoentity.SessionStore;
 import com.learn.pojoentity.ShortTimeScopeInsideLongScope;
 import com.learn.pojoentity.SingletonScope;
+import com.learn.pojoentitywithparamconstruct.ApplicationScopeWithConstruct;
+import com.learn.produceeimpl.GreetingCard;
+import com.learn.produceeimpl.GreetingCardImpl;
+import com.learn.produceeimpl.GreetingType;
+import com.learn.produceeimpl.Greetings;
 import com.learn.service.EmpRegisterService;
 
 @Path("hello")
@@ -56,12 +62,21 @@ public class HelloRest {
 	ScopeEntityWithoutAnnotatation scopeEntityWithoutAnnotatation1;
 	
 	
+	
 	// session scope
 	@Inject                               // it is lazy initialization. it is created when this variable is referenced.
 	SessionStore session;
 	
 	@Inject
 	ConversationScope conversationScope;
+	
+	/*@Inject
+	@Greetings(GreetingType.HELLO)
+	GreetingCard greetingCard;*/
+	
+	@Inject
+	@Named("admin")     // how to use the @produces annotation
+	ApplicationScopeWithConstruct applicationScopeWithConstruct;
 	
 	 @Path("test")    // http://localhost:8080/cdiInjectionWebProj/rest/hello/test
 	 @GET
@@ -187,6 +202,22 @@ public class HelloRest {
 		 
 		 System.out.println("conversation scope object:"+conversationScope+"   id:"+conversationScope.getConversation().getId());
 		 return "conversationscope method invoked";
+	 }
+	 /*@Path("producetest")      // @produces annotation implementation copied example
+	 @GET
+	 public String produceannotation(){
+		 
+		 System.err.println("produce way of creating object:"+greetingCard+"  class type:" + (greetingCard instanceof GreetingCardImpl));
+		 return "produce annotation test method called";
+	 }*/
+	 
+	 @Path("scopewithcontruct")   // @produces annotation implementation mine example
+	 @GET
+	 public String scopeWithConst(){
+		 
+		 System.out.println("scope object with contructor:"+applicationScopeWithConstruct);
+		 System.out.println(applicationScopeWithConstruct.getString());
+		 return "object created for the scope with param contructor";
 	 }
 	 
  

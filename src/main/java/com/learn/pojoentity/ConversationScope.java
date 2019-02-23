@@ -3,6 +3,7 @@ package com.learn.pojoentity;
 import java.io.Serializable;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
@@ -20,7 +21,7 @@ public class ConversationScope implements Serializable {
 	  public void init(){
 	    counter = 0;
 	    conversation.begin();
-	    System.out.println("<<< conversation scope object created with id:"+conversation.getId());
+	    System.out.println("<<< conversation scope object created");
 	    
 	  }
 	 public Conversation getConversation() {
@@ -37,6 +38,9 @@ public class ConversationScope implements Serializable {
 	  public void increment(){
 	    counter++;
 	  }
-	  
+	@PreDestroy
+	public void destroy(){
+		System.out.println("<<< conversation scope object destroyed");
+	}
 
 }

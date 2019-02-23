@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 
 @Singleton
@@ -22,4 +23,8 @@ public class SingletonScope {
    public void display(){
 	   
    }
+	@PreDestroy
+	public void destroy(){
+		System.out.println("<<<  Singleton object destroyed");
+	}
 }

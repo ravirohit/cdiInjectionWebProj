@@ -9,26 +9,37 @@
 		    <url-pattern>/rest/*</url-pattern>
 		 </servlet-mapping>
    http url to test: http://localhost:8080/cdiInjectionWebProj/rest/hello
-   
+-> Beans: A Java EE component is a bean if the lifecycle of its instances may be managed by the container(CDI specification).
+         -> A bean type may be an interface, a concrete class, or an abstract class and may be declared final or have final methods.
+         -> can a bean can be without parameterized constructor.
+         -> attribute associated with bean could be: qulifier, scope, Expression language, interceptor binding.
+-> managed beans: A managed bean is implemented by a Java class, which is called its bean class. 
+        -> it meets all the following conditions:
+           1. It is not a nonstatic inner class.
+           2. It is a concrete class or is annotated @Decorator.
+           3. It has an appropriate constructor. That is, one of the following is the case:
+             -> The class has a constructor with no parameters.
+             -> The class declares a constructor annotated @Inject.
 -> if there is one interface and multiple implemented class. and if we want to inject with the interface name. then it will create a ambiguity while
    injecting. here @Default and @Alternate annotation comes into the pictures.
 -> if we have not annotated any of the implemented class then the class annotated with @Default annotation will be inject ignoring the class annotated
    with @Alternative.
 
 -> About Annotation:
-@Inject
-@Default
-@Alternative
-@Named
-@Any
-@ApplicationScoped
-@Qualifier
-@PostConstruct
+@Inject      done
+@Default       done
+@Alternative       done
+@Named        done
+@Any          not done
+@ApplicationScoped       done
+@Qualifier       done
+@PostConstruct      done
+@Producer             done  //  https://www.javacodegeeks.com/2013/04/java-ee-cdi-producer-methods-tutorial.html
 
 Note: can't use custom qualifier and @Default or custom qualifier and @Alternative annotation together on the same class.
 
 -> The set of bean defining annotations contains:
-		@ApplicationScoped, @SessionScoped, @ConversationScoped and @RequestScoped annotations,
+		@ApplicationScoped, @SessionScoped, @ConversationScoped and @RequestScoped annotations and Dependent(if none is specified)
 -> by default CDI bean dependency is lazy initialization means, whenever we will use the or reference the bean variable that time only object will be 
    created. 
 -> while Singleton is early initialization means, singleton object is created whenever the class containing the singleton class reference is used or 
@@ -48,8 +59,16 @@ Note: can't use custom qualifier and @Default or custom qualifier and @Alternati
  2. @ApplicationScoped: An object which is defined as @ApplicationScoped is created once for the duration of the application.
                         even if we will try to inject multiple times, same object will be injected. never created new one.
                         test url: http://localhost:8080/cdiInjectionWebProj/rest/hello/test
- 
-->  @PostConstruct annotation is used on a method that needs to be executed after dependency injection is done to perform any initialization.
+ 3. @SessionScoped: it is used to maintain session between client and server using cookie. for detailed info please check Q&A section.
+ 4. @ConversationScoped: yet to checked.
+ 5. @Dependent: scope of the bean by default/without annotation is dependent only.
+-> @PostConstruct annotation is used on a method that needs to be executed after dependency injection is done to perform any initialization.
+-> @Producers: In CDI, a Producer method generates an object that can then be injected. 
+               -> Producer methods can be used when we want to inject an object that is not itself a bean, when the concrete type of the object to be 
+                  injected may vary at runtime, or when the object requires some custom initialization that the bean constructor does not perform.
+               -> Producer methods allow us to expose any JDK class as a bean and define multiple beans, with different scopes or initialization, 
+                  for the same implementation class
+               -> The scope of the Producer is set to Dependent by default. 
 
 ----- Interceptor 
 
@@ -115,15 +134,22 @@ Ans: Let a class SessionStore is annotated with @SessionScoped and injected in t
  Q) How long the session object will be available in the server side, for example, we have login to the account and didn't logout but clear the cookie from browser.
    as logging out api is not getting called server will not invalidate the session to delete the session object. as session object will be managed by CDI. So how
    long this object will be alive at the server. 
-Q) How to use @Named qualifier annotation in CDI?
-Ans: -> implementation class of interface
-	@Named("bmwAutoService")
-	@RequestScoped
-    class AutoServiceIml implements AutoService{};
+Q) how to access beans through EL names?
+Ans: To make a bean accessible through the EL, use the @Named built-in qualifier:
+    -> implementation class of interface
+		@Named("bmwAutoService")
+		@RequestScoped
+	    class AutoServiceIml implements AutoService{};
     -> injecting implemented class to interface 
-    @Inject
-    @Named("bmwAutoService")
-    private AutoService bmwAutoService;
+	    @Inject
+	    @Named("bmwAutoService")
+	    private AutoService bmwAutoService;
+Q) Can we inject scope class with parameterized constructor. 
+Ans: actually we can create a scope class with parameterized constructor. but as because it is parameterized constructor, it can't be injected directly.
+Q) Follow up question, Then what is the way to make this class injectible?
+Ans: we can create a factory scope class with the help of @Produces annotation and with @ApplicationScoped annotation.
+     just like impl in package of this repo code: "com.learn.pojoentitywithparamconstruct"
+
 ----- Interceptor and Decorator -------   
 
 
@@ -149,6 +175,9 @@ Q) SessionScope annotated class, observation:
 Q) Follow up question: How to remove a CDI session scoped bean?
 Q) concept of @ConversationScoped functionality.
 Q) Does CDI is different for different server like jboss, tomcat, wildfly?
+Q) What are Events and Observers in CDI?
+Q) CDI and Lazy Initialization
+
 
 
 

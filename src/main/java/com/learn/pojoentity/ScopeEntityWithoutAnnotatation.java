@@ -1,6 +1,7 @@
 package com.learn.pojoentity;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 public class ScopeEntityWithoutAnnotatation {
 	
@@ -10,6 +11,10 @@ public class ScopeEntityWithoutAnnotatation {
 	}
 	public void addName(){
 		System.out.println("class without scope entity called");
+	}
+	@PreDestroy
+	public void destroy(){
+		System.out.println("<<< scope without annotation object destroyed");
 	}
 
 }

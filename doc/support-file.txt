@@ -1,0 +1,7 @@
+-> code equivalent for @Inject without annotation.
+   try (CDI<Object> container = new Weld().initialize()) {
+            Checkout checkout = container.select(Checkout.class).get();        //return a object of Checkout.class
+        }
+                 OR
+   @Inject
+   private Checkout checkout;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 
 
@@ -24,5 +25,9 @@ public class ApplicationScope {
     
 	public void display(){
 		System.out.println("name added in the application scope:"+nameList);
+	}
+	@PreDestroy
+	public void destroy(){
+		System.out.println("<<< application scope object destroyed");
 	}
 }

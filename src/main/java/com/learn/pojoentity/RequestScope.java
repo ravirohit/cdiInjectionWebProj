@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.RequestScoped;
 
 @RequestScoped
@@ -23,5 +24,9 @@ public class RequestScope {
     
 	public void display(){
 		System.out.println("name added in the request scope:"+nameList);
+	}
+	@PreDestroy
+	public void destroy(){
+		System.out.println("<<< Request scope object destroyed");
 	}
 }

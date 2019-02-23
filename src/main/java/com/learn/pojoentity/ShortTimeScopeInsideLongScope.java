@@ -1,6 +1,7 @@
 package com.learn.pojoentity;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -21,6 +22,10 @@ public class ShortTimeScopeInsideLongScope {
 	}
 	public RequestScope getRequestObj(){
 		return requestScope;
+	}
+	@PreDestroy
+	public void destroy(){
+		System.out.println("<<<  ShortTimeScopeInsideLongScope object destroyed");
 	}
 
 }

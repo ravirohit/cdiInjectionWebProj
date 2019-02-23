@@ -30,9 +30,9 @@ public class SessionStore implements Serializable{
         this.uname = uname;
     }
 
-    @PreDestroy
-    public void onSessionDestruction(){
-        INSTANCE_COUNT.decrementAndGet();
-    }
+	@PreDestroy
+	public void destroy(){
+		System.out.println("<<<  session scope object destroyed");
+	}
     
 }
