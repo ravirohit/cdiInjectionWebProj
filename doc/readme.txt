@@ -72,8 +72,30 @@ Note: can't use custom qualifier and @Default or custom qualifier and @Alternati
 
 ----- Interceptor 
 
- 
- 
+ ----- Basic Events
+ -> operation involve in handling event:
+    -> Fire specific events.
+	-> Use event qualifier.
+	-> Observe events fired during transactions.
+	-> Configure even observer bean instantiation.
+Code example: fire an event:
+  @Named
+	public class EventSource {
+	    @Inject
+	    private Event<String> simpleMessageEvent;
+	    public void fireEvent(){
+	    simpleMessageEvent.fire("Hello");
+	    }
+	}
+-> Listening to an Event:
+	@Named
+	public class EventObserver {
+	    public void observeEvent(@Observes String message){
+	    System.out.println(message);
+	    }
+	}
+-> Event Qualifiers: it is used i the exactly the same way we used for the bean injection using custom qualifier at @Inject and at @Observes 
+                     annotation.
  ------------------- Q&A ----------------------
  Q) How to inject the class annotated with @Alternative   
 Ans: create custom qualifier annotation: 
@@ -150,7 +172,10 @@ Q) Follow up question, Then what is the way to make this class injectible?
 Ans: we can create a factory scope class with the help of @Produces annotation and with @ApplicationScoped annotation.
      just like impl in package of this repo code: "com.learn.pojoentitywithparamconstruct"
 
------ Interceptor and Decorator -------   
+----- Interceptor and Decorator -------
+
+
+   
 
 
 
@@ -177,6 +202,16 @@ Q) concept of @ConversationScoped functionality.
 Q) Does CDI is different for different server like jboss, tomcat, wildfly?
 Q) What are Events and Observers in CDI?
 Q) CDI and Lazy Initialization
+
+
+---- to study
+https://docs.oracle.com/javaee/6/tutorial/doc/gkhjx.html
+interceptor
+decorator
+stereotypes
+Asynchronous Method invocation in session beans.
+security in java ee;
+
 
 
 
