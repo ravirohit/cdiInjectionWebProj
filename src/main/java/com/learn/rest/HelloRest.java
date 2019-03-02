@@ -15,6 +15,7 @@ import javax.ws.rs.core.Context;
 
 import com.learn.customannotation.Emp;
 import com.learn.customannotation.TempEmp;
+import com.learn.interceptorimpl.Log;
 import com.learn.pojoentity.ApplicationScope;
 import com.learn.pojoentity.ConversationScope;
 import com.learn.pojoentity.RequestScope;
@@ -22,6 +23,7 @@ import com.learn.pojoentity.ScopeEntityWithoutAnnotatation;
 import com.learn.pojoentity.SessionStore;
 import com.learn.pojoentity.ShortTimeScopeInsideLongScope;
 import com.learn.pojoentity.SingletonScope;
+import com.learn.pojoentityAsysncimpl.ApplicationBeanWithAsyncMethod;
 import com.learn.pojoentitywithparamconstruct.ApplicationScopeWithConstruct;
 import com.learn.produceeimpl.GreetingCard;
 import com.learn.produceeimpl.GreetingCardImpl;
@@ -30,6 +32,7 @@ import com.learn.produceeimpl.Greetings;
 import com.learn.service.EmpRegisterService;
 
 @Path("hello")
+@Log
 public class HelloRest {
 	
 	// testing multiple class implementing same interface
@@ -77,6 +80,9 @@ public class HelloRest {
 	@Inject
 	@Named("admin")     // how to use the @produces annotation
 	ApplicationScopeWithConstruct applicationScopeWithConstruct;
+	
+	@Inject
+	ApplicationBeanWithAsyncMethod applicationBeanWithAsyncMethod;
 	
 	 @Path("test")    // http://localhost:8080/cdiInjectionWebProj/rest/hello/test
 	 @GET
@@ -220,6 +226,14 @@ public class HelloRest {
 		 return "object created for the scope with param contructor";
 	 }
 	 
+	 @Path("asynmethod")
+	 @GET
+	 public String callAsynMethod(){
+		 System.out.println("calling async method");
+		 applicationBeanWithAsyncMethod.display();
+		 System.out.println("called async method");
+		 return "asyn method impl called";
+	 }
  
 }
 

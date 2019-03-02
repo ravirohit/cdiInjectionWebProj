@@ -52,7 +52,7 @@ Note: can't use custom qualifier and @Default or custom qualifier and @Alternati
 		@Interceptor and @Decorator annotation
 -> all stereotype annotations (i.e. annotations annotated with @Stereotype), and the @Dependent scope annotation.
 -> does below annotation belong to CDI or if not where does it belong:
-		@Dependent @Singleton
+   @Singleton
 		
 -> explanation about annotation:   
  1. @RequestScoped: for each http request, new object will be created to service it.
@@ -61,7 +61,10 @@ Note: can't use custom qualifier and @Default or custom qualifier and @Alternati
                         test url: http://localhost:8080/cdiInjectionWebProj/rest/hello/test
  3. @SessionScoped: it is used to maintain session between client and server using cookie. for detailed info please check Q&A section.
  4. @ConversationScoped: yet to checked.
- 5. @Dependent: scope of the bean by default/without annotation is dependent only.
+ 5. @Dependent: the dependent scope is the default scope, if no scope is defined (if a class is not annotated).
+               -> All not annotated classes, or "POJOs", are dependent-scoped.
+               -> In CDI, classes annotated with @Dependent are "pseudo-scoped", what means:
+               -> "No injected instance of the bean is ever shared between multiple injection points"
 -> @PostConstruct annotation is used on a method that needs to be executed after dependency injection is done to perform any initialization.
 -> @Producers: In CDI, a Producer method generates an object that can then be injected. 
                -> Producer methods can be used when we want to inject an object that is not itself a bean, when the concrete type of the object to be 
@@ -70,8 +73,29 @@ Note: can't use custom qualifier and @Default or custom qualifier and @Alternati
                   for the same implementation class
                -> The scope of the Producer is set to Dependent by default. 
 
------ Interceptor 
-
+-------- Interceptor 
+-> The interceptor performs tasks, such as logging or auditing, that are separate from the business logic of the application and are repeated often 
+   within an application. Such tasks are often called cross-cutting tasks.
+-> Every @AroundInvoke method takes a javax.interceptor.InvocationContext argument, returns a java.lang.Object, and throws an Exception. It can call 
+   InvocationContext methods. The @AroundInvoke method must call the proceed method, which causes the target class method to be invoked.
+-> steps to create interceptor: 
+-> create interceptor annotation to indentify which interceptor we are using:
+   @InterceptorBinding
+	@Target({ ElementType.TYPE, ElementType.METHOD })
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface Log {
+	}
+-> create a interceptor class:
+	@Interceptor
+	@Log  //binding the interceptor here. now any method annotated with @Log would be intercepted by logMethodEntry
+	public class LoggingInterceptor {
+	    @AroundInvoke
+	    public Object logMethodEntry(InvocationContext ctx) throws Exception {
+	        System.out.println("Entering method: " + ctx.getMethod().getName());
+	        //or logger.info statement 
+	        return ctx.proceed();
+	    }
+	}
  ----- Basic Events
  -> operation involve in handling event:
     -> Fire specific events.
@@ -94,7 +118,7 @@ Code example: fire an event:
 	    System.out.println(message);
 	    }
 	}
--> Event Qualifiers: it is used i the exactly the same way we used for the bean injection using custom qualifier at @Inject and at @Observes 
+-> Event Qualifiers: it is used n exactly the same way we used for the bean injection using custom qualifier at @Inject and at @Observes 
                      annotation.
  ------------------- Q&A ----------------------
  Q) How to inject the class annotated with @Alternative   
@@ -175,10 +199,7 @@ Ans: we can create a factory scope class with the help of @Produces annotation a
 ----- Interceptor and Decorator -------
 
 
-   
-
-
-
+  
 ------- unanswered questions --------
 Q) what is jsf annotation in cdi? 
 Q) @Stateful vs @SessionScoped
@@ -204,9 +225,8 @@ Q) What are Events and Observers in CDI?
 Q) CDI and Lazy Initialization
 
 
----- to study
-https://docs.oracle.com/javaee/6/tutorial/doc/gkhjx.html
-interceptor
+---- to study  https://docs.oracle.com/javaee/6/tutorial/doc/gkhjx.html
+interceptor          https://www.developer.com/java/understanding-interceptors-for-java-ee.html
 decorator
 stereotypes
 Asynchronous Method invocation in session beans.
